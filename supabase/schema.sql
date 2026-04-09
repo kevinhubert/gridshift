@@ -55,4 +55,3 @@ create policy "Anyone can read price data"
 create policy "Service role can write prices"
   on public.price_cache for insert
   with check (true);
-```
