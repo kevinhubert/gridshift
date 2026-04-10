@@ -136,7 +136,9 @@ export default function App() {
               width={180}
               height={39}
             />
-            <p className="text-sm text-neutral-500 pl-[50px]">Stop paying ERCOT's peak tax</p>
+            <p className="text-sm text-navy-700 dark:text-white pl-[50px]">
+              Beat the <span className="text-orange-500">peak</span>
+            </p>
           </div>
           <div className="flex items-center gap-3">
             {loading && (
