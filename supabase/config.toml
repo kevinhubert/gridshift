@@ -1,0 +1,8 @@
+[functions.get-prices]
+verify_jwt = false
+
+[functions.get-insights]
+verify_jwt = false
+
+[functions.cache-prices]
+verify_jwt = false

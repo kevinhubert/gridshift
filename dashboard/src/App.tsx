@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
-import { PricePoint, Device, OptimizationResponse } from './types';
+import { PricePoint, OptimizationResponse } from './types';
+
+const FUNCTION_BASE = import.meta.env.VITE_FUNCTION_BASE || '';
 
 const DEMO_HUB = 'LZ_HOUSTON';
 
-// Demo data showing the price curve shape
+// Demo data for when API isn't available
 const DEMO_PRICES: PricePoint[] = [
   { intervalEnd: '00:00', pricePerMwh: 33 },
   { intervalEnd: '01:00', pricePerMwh: 31 },
@@ -66,14 +68,59 @@ const DEMO_INSIGHTS: OptimizationResponse = {
   ],
 };
 
+interface PriceApiResponse {
+  hub: string;
+  day: string;
+  prices: { interval_end: string; price_per_mwh: number }[];
+}
+
 export default function App() {
   const [prices, setPrices] = useState<PricePoint[] | null>(null);
-  const [insights, setInsights] = useState<OptimizationResponse | null>(null);
+  const [insights] = useState<OptimizationResponse | null>(DEMO_INSIGHTS);
   const [hub, setHub] = useState(DEMO_HUB);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!FUNCTION_BASE) {
+      setPrices(DEMO_PRICES);
+      return;
+    }
+
+    const url = `${FUNCTION_BASE}/get-prices?hub=${hub}`;
+
+    setLoading(true);
+    setError(null);
+
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data: PriceApiResponse) => {
+        if (data.prices && data.prices.length > 0) {
+          // Convert interval_end to just HH:MM
+          const formatted: PricePoint[] = data.prices.map((p) => ({
+            intervalEnd: p.interval_end.split('T')[1]?.substring(0, 5) || '00:00',
+            pricePerMwh: p.price_per_mwh,
+          }));
+          setPrices(formatted);
+        } else {
+          // No data yet — cron hasn't populated
+          setPrices(null);
+          setError('No data yet — cron populates every 15 min');
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch prices:', err);
+        setPrices(DEMO_PRICES);
+        setError('Using demo data');
+        setLoading(false);
+      });
+  }, [hub]);
 
   const displayPrices = prices || DEMO_PRICES;
-  const displayInsights = insights || DEMO_INSIGHTS;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -81,10 +128,13 @@ export default function App() {
       <header className="border-b border-slate-800 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-emerald-400">GridShift</h1>
+            <h1 className="text-2xl font-bold text-blue-500">GridShift</h1>
             <p className="text-sm text-slate-500">Stop paying ERCOT's peak tax</p>
           </div>
           <div className="flex items-center gap-3">
+            {loading && (
+              <span className="text-xs text-slate-500 animate-pulse">Fetching...</span>
+            )}
             <label className="text-sm text-slate-400">Hub:</label>
             <select
               value={hub}
@@ -102,6 +152,11 @@ export default function App() {
 
       {/* Main */}
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+        {error && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-2 text-sm text-amber-400">
+            {error}
+          </div>
+        )}
         <Dashboard prices={displayPrices} hub={hub} />
       </main>
 

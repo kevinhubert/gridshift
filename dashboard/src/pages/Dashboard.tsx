@@ -72,13 +72,13 @@ export default function Dashboard({ prices, hub, insights }: DashboardProps) {
           label="Cheapest Today"
           value={formatPrice(min)}
           sublabel={formatHour(cheapest[0]?.intervalEnd || '00:00')}
-          color="#10b981"
+          color="#34D399"
         />
         <StatCard
           label="Most Expensive"
           value={formatPrice(max)}
           sublabel={formatHour(mostExpensive[0]?.intervalEnd || '00:00')}
-          color="#ef4444"
+          color="#E05A2B"
         />
         <StatCard
           label="Average"
@@ -89,26 +89,26 @@ export default function Dashboard({ prices, hub, insights }: DashboardProps) {
       </div>
 
       {/* Price chart */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+      <div className="bg-navy-900 border border-neutral-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-lg font-semibold">Today's Price Curve</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-neutral-500">
               {hub} · {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
             </p>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-slate-400">Cheap</span>
+              <div className="w-3 h-3 rounded-full bg-blue-500" />
+              <span className="text-neutral-400">Cheap</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-slate-400">Moderate</span>
+              <span className="text-neutral-400">Moderate</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <span className="text-slate-400">Peak</span>
+              <div className="w-3 h-3 rounded-full bg-orange-500" />
+              <span className="text-neutral-400">Peak</span>
             </div>
           </div>
         </div>
@@ -118,19 +118,19 @@ export default function Dashboard({ prices, hub, insights }: DashboardProps) {
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#4DA3FF" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#4DA3FF" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
               <XAxis
                 dataKey="time"
-                tick={{ fontSize: 11, fill: '#64748b' }}
+                tick={{ fontSize: 11, fill: '#A3A39E' }}
                 tickLine={false}
                 axisLine={{ stroke: '#1e293b' }}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: '#64748b' }}
+                tick={{ fontSize: 11, fill: '#A3A39E' }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v) => `$${v}`}
@@ -146,11 +146,11 @@ export default function Dashboard({ prices, hub, insights }: DashboardProps) {
                 formatter={(value: number) => [formatPrice(value), 'Price']}
                 labelFormatter={(label) => `${label}`}
               />
-              <ReferenceLine y={avg} stroke="#64748b" strokeDasharray="4 4" label={{ value: 'avg', fill: '#64748b', fontSize: 10 }} />
+              <ReferenceLine y={avg} stroke="#A3A39E" strokeDasharray="4 4" label={{ value: 'avg', fill: '#A3A39E', fontSize: 10 }} />
               <Area
                 type="monotone"
                 dataKey="price"
-                stroke="#10b981"
+                stroke="#4DA3FF"
                 fill="url(#priceGradient)"
                 strokeWidth={2}
                 dot={false}
@@ -171,41 +171,41 @@ export default function Dashboard({ prices, hub, insights }: DashboardProps) {
             ))}
           </div>
         ) : (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center">
-            <p className="text-slate-400">Add your devices to see potential savings</p>
-            <p className="text-sm text-slate-500 mt-1">Configure flexible loads in your profile</p>
+          <div className="bg-navy-900 border border-neutral-800 rounded-xl p-8 text-center">
+            <p className="text-neutral-400">Add your devices to see potential savings</p>
+            <p className="text-sm text-neutral-500 mt-1">Configure flexible loads in your profile</p>
           </div>
         )}
       </div>
 
       {/* Cheapest windows */}
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 className="font-semibold text-emerald-400 mb-3">🟢 Best Times to Run</h3>
+        <div className="bg-navy-900 border border-neutral-800 rounded-xl p-6">
+          <h3 className="font-semibold text-blue-500 mb-3">🟢 Best Times to Run</h3>
           <ul className="space-y-2">
             {cheapest.map((p, i) => (
-              <li key={i} className="flex justify-between items-center py-2 border-b border-slate-800 last:border-0">
-                <span className="text-slate-300">{formatHour(p.intervalEnd)}</span>
-                <span className="font-mono text-emerald-400">{formatPrice(p.pricePerMwh)}/MWh</span>
+              <li key={i} className="flex justify-between items-center py-2 border-b border-neutral-800 last:border-0">
+                <span className="text-neutral-300">{formatHour(p.intervalEnd)}</span>
+                <span className="font-mono text-blue-500">{formatPrice(p.pricePerMwh)}/MWh</span>
               </li>
             ))}
           </ul>
-          <p className="text-xs text-slate-500 mt-3">
+          <p className="text-xs text-neutral-500 mt-3">
             Run dishwashers, laundry, EV charging during these hours
           </p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 className="font-semibold text-red-400 mb-3">🔴 Times to Avoid</h3>
+        <div className="bg-navy-900 border border-neutral-800 rounded-xl p-6">
+          <h3 className="font-semibold text-orange-500 mb-3">🔴 Times to Avoid</h3>
           <ul className="space-y-2">
             {mostExpensive.map((p, i) => (
-              <li key={i} className="flex justify-between items-center py-2 border-b border-slate-800 last:border-0">
-                <span className="text-slate-300">{formatHour(p.intervalEnd)}</span>
-                <span className="font-mono text-red-400">{formatPrice(p.pricePerMwh)}/MWh</span>
+              <li key={i} className="flex justify-between items-center py-2 border-b border-neutral-800 last:border-0">
+                <span className="text-neutral-300">{formatHour(p.intervalEnd)}</span>
+                <span className="font-mono text-orange-500">{formatPrice(p.pricePerMwh)}/MWh</span>
               </li>
             ))}
           </ul>
-          <p className="text-xs text-slate-500 mt-3">
+          <p className="text-xs text-neutral-500 mt-3">
             If on a time-of-use plan, shift flexible loads away from these hours
           </p>
         </div>
@@ -226,44 +226,44 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-      <p className="text-sm text-slate-500 mb-1">{label}</p>
+    <div className="bg-navy-900 border border-neutral-800 rounded-xl p-4">
+      <p className="text-sm text-neutral-500 mb-1">{label}</p>
       <p className="text-2xl font-bold" style={{ color }}>
         {value}
       </p>
-      <p className="text-xs text-slate-500 mt-1">{sublabel}</p>
+      <p className="text-xs text-neutral-500 mt-1">{sublabel}</p>
     </div>
   );
 }
 
 function InsightCard({ insight }: { insight: Insight }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <div className="bg-navy-900 border border-neutral-800 rounded-xl p-5">
       <div className="flex items-start justify-between mb-3">
-        <h4 className="font-semibold text-slate-100">{insight.device}</h4>
-        <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
+        <h4 className="font-semibold text-neutral-100">{insight.device}</h4>
+        <span className="text-xs bg-blue-500/20 text-blue-500 px-2 py-0.5 rounded">
           {formatCost(insight.monthlySavings)}/mo
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <p className="text-slate-500 text-xs mb-0.5">Optimal</p>
-          <p className="font-mono text-emerald-400">
+          <p className="text-neutral-500 text-xs mb-0.5">Optimal</p>
+          <p className="font-mono text-blue-500">
             {insight.optimalWindow.hour}:00 — {formatCost(insight.estimatedDailyCostAtOptimal)}/day
           </p>
         </div>
         <div>
-          <p className="text-slate-500 text-xs mb-0.5">If at peak</p>
-          <p className="font-mono text-red-400">
+          <p className="text-neutral-500 text-xs mb-0.5">If at peak</p>
+          <p className="font-mono text-orange-500">
             {insight.peakWindow.hour}:00 — {formatCost(insight.estimatedDailyCostAtPeak)}/day
           </p>
         </div>
       </div>
 
-      <div className="mt-3 pt-3 border-t border-slate-800">
-        <p className="text-xs text-slate-400">
-          Save <span className="text-emerald-400 font-semibold">{formatCost(insight.monthlySavings)}/month</span> by
+      <div className="mt-3 pt-3 border-t border-neutral-800">
+        <p className="text-xs text-neutral-400">
+          Save <span className="text-blue-500 font-semibold">{formatCost(insight.monthlySavings)}/month</span> by
           shifting to the cheapest window
         </p>
       </div>

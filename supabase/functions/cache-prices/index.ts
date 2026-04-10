@@ -97,7 +97,7 @@ serve(async (req) => {
     }
 
     // Batch insert
-    const { error } = await supabase.from('price_cache').insert(records);
+    const { error } = await supabase.from('price_cache').upsert(records, { onConflict: 'hub,interval_end' });
 
     if (error) throw error;
 

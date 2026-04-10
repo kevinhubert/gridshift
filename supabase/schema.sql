@@ -27,7 +27,8 @@ create table public.price_cache (
   price_per_mwh numeric not null,
   interval_end timestamptz not null,
   oper_day date not null,
-  fetched_at timestamptz default now()
+  fetched_at timestamptz default now(),
+  unique (hub, interval_end)
 );
 
 -- Index for fast hub+day lookups
