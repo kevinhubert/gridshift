@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import posthog from 'posthog-js';
 import Dashboard from './pages/Dashboard';
 import { PricePoint } from './types';
 
@@ -104,7 +105,10 @@ export default function App() {
             <label className="text-sm text-slate-400">Hub:</label>
             <select
               value={hub}
-              onChange={(e) => setHub(e.target.value)}
+              onChange={(e) => {
+                setHub(e.target.value);
+                posthog.capture('hub_changed', { hub: e.target.value });
+              }}
               className="bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-sm"
             >
               <option value="LZ_HOUSTON">LZ_HOUSTON (Austin)</option>
