@@ -48,7 +48,7 @@ Defined in `dashboard/.env` (not committed with real secrets in a proper setup):
 
 ### Brand assets
 
-- **Logos:** `dashboard/public/logo-light.svg`, `dashboard/public/logo-dark.svg` — switched in the header based on theme.
+- **Logo:** Inline SVG + wordmark in [dashboard/src/components/brand/GridShiftLogo.tsx](../dashboard/src/components/brand/GridShiftLogo.tsx); `variant` is `light` or `dark` for “grid” text color (header passes theme).
 - **Favicon:** `dashboard/public/favicon-blue.svg` (referenced from `index.html`).
 
 ### Typography

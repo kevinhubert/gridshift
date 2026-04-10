@@ -1,27 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation, useMatch } from 'react-router-dom';
+import { Outlet, useLocation, useMatch } from 'react-router-dom';
 import posthog from 'posthog-js';
-import { Moon, Sun } from 'lucide-react';
 import { PricePoint } from '@/types';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { GridShiftHeader } from '@/components/layout/GridShiftHeader';
+import { DEMO_HUB } from '@/constants/hubs';
 
 const FUNCTION_BASE = import.meta.env.VITE_FUNCTION_BASE || '';
 
-export const DEMO_HUB = 'LZ_HOUSTON';
-
-const HUB_OPTIONS = [
-  { value: 'LZ_HOUSTON', label: 'LZ_HOUSTON (Austin)' },
-  { value: 'HB_HOUSTON', label: 'HB_HOUSTON' },
-  { value: 'HB_NORTH', label: 'HB_NORTH' },
-  { value: 'LZ_RAYBN', label: 'LZ_RAYBN' },
-] as const;
+export { DEMO_HUB } from '@/constants/hubs';
 
 export const DEMO_PRICES: PricePoint[] = [
   { intervalEnd: '00:00', pricePerMwh: 33 },
@@ -150,79 +136,17 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8 min-w-0">
-            <Link to="/" className="inline-flex shrink-0 items-center" aria-label="GridShift home">
-              <img
-                src={theme === 'dark' ? '/logo-dark.svg' : '/logo-light.svg'}
-                alt="GridShift"
-                width={296}
-                height={64}
-                className="h-14 w-auto sm:h-[4.25rem]"
-              />
-            </Link>
-            <nav className="flex items-center gap-4 text-sm font-medium">
-              <Link
-                to="/"
-                className="text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/about"
-                className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
-                About
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-3">
-            {isHome && loading && (
-              <span className="text-xs text-muted-foreground animate-pulse">Fetching...</span>
-            )}
-            {isHome && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Hub:</span>
-                <Select
-                  value={hub}
-                  onValueChange={(value) => {
-                    setHub(value);
-                    posthog.capture('hub_changed', { hub: value });
-                  }}
-                >
-                  <SelectTrigger id="hub-select" className="w-[220px]" aria-label="ERCOT load zone hub">
-                    <SelectValue placeholder="Select hub" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HUB_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-screen flex-col">
+      <GridShiftHeader
+        theme={theme}
+        onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      />
 
-      <main className="max-w-6xl mx-auto w-full px-6 py-8 space-y-8 flex-1">
+      <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-6 py-8">
         <Outlet context={outletContext} />
       </main>
 
-      <footer className="border-t border-border mt-auto py-6 text-center text-sm text-muted-foreground">
+      <footer className="mt-auto border-t border-border py-6 text-center text-sm text-muted-foreground">
         GridShift · ERCOT real-time data · Updated every 15 minutes
       </footer>
     </div>

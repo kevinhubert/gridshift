@@ -17,7 +17,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { MetricCards } from '@/components/dashboard/MetricCards';
+import { PriceAlerts } from '@/components/dashboard/PriceAlerts';
 
 interface DashboardProps {
   prices: PricePoint[];
@@ -45,18 +46,11 @@ function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`;
 }
 
-function formatCost(cost: number): string {
-  return `$${cost.toFixed(2)}`;
-}
-
 export default function Dashboard({ prices, hub, isDark = true, insights }: DashboardProps) {
   const priceValues = prices.map((p) => p.pricePerMwh);
   const min = Math.min(...priceValues);
   const max = Math.max(...priceValues);
   const avg = priceValues.reduce((a, b) => a + b, 0) / priceValues.length;
-  const now = new Date();
-  const currentHour = now.getHours();
-
   const chartData = prices.map((p) => ({
     time: formatHour(p.intervalEnd),
     hour: parseInt(p.intervalEnd.split(':')[0]),
@@ -64,8 +58,17 @@ export default function Dashboard({ prices, hub, isDark = true, insights }: Dash
     color: getPriceColor(p.pricePerMwh, min, max),
   }));
 
-  const cheapest = [...prices].sort((a, b) => a.pricePerMwh - b.pricePerMwh).slice(0, 3);
-  const mostExpensive = [...prices].sort((a, b) => b.pricePerMwh - a.pricePerMwh).slice(0, 3);
+  const cheapest = [...prices].sort((a, b) => a.pricePerMwh - b.pricePerMwh);
+  const mostExpensive = [...prices].sort((a, b) => b.pricePerMwh - a.pricePerMwh);
+
+  const dailySavingsTotal =
+    insights?.reduce(
+      (s, i) => s + Math.max(0, i.estimatedDailyCostAtPeak - i.estimatedDailyCostAtOptimal),
+      0
+    ) ?? 0;
+  const savingsValue =
+    insights && insights.length > 0 ? formatPrice(dailySavingsTotal) : '—';
+  const savingsDetail = insights?.length ? 'vs. running at peak' : 'vs. flat rate';
 
   const gridColor = isDark ? '#132B45' : '#e5e3dd';
   const tickColor = isDark ? '#7A7A75' : '#7A7A75';
@@ -75,32 +78,15 @@ export default function Dashboard({ prices, hub, isDark = true, insights }: Dash
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          label="Current Price"
-          value={formatPrice(prices[currentHour]?.pricePerMwh || 0)}
-          sublabel={formatHour(prices[currentHour]?.intervalEnd || '00:00')}
-          color={getPriceColor(prices[currentHour]?.pricePerMwh || 0, min, max)}
-        />
-        <StatCard
-          label="Cheapest Today"
-          value={formatPrice(min)}
-          sublabel={formatHour(cheapest[0]?.intervalEnd || '00:00')}
-          color="#34D399"
-        />
-        <StatCard
-          label="Most Expensive"
-          value={formatPrice(max)}
-          sublabel={formatHour(mostExpensive[0]?.intervalEnd || '00:00')}
-          color="#E05A2B"
-        />
-        <StatCard
-          label="Average"
-          value={formatPrice(avg)}
-          sublabel="across all hours"
-          color="#A3A39E"
-        />
-      </div>
+      <MetricCards
+        low={min}
+        lowAtInterval={cheapest[0]?.intervalEnd ?? '00:00'}
+        high={max}
+        highAtInterval={mostExpensive[0]?.intervalEnd ?? '00:00'}
+        avg={avg}
+        savingsValue={savingsValue}
+        savingsDetail={savingsDetail}
+      />
 
       <Card>
         <CardHeader>
@@ -113,15 +99,15 @@ export default function Dashboard({ prices, hub, isDark = true, insights }: Dash
           <CardAction>
             <div className="flex flex-wrap items-center gap-4 text-xs">
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <div className="h-3 w-3 rounded-full bg-blue-500" />
                 <span className="text-muted-foreground">Cheap</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
+                <div className="h-3 w-3 rounded-full bg-amber-500" />
                 <span className="text-muted-foreground">Moderate</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-orange-500" />
+                <div className="h-3 w-3 rounded-full bg-orange-500" />
                 <span className="text-muted-foreground">Peak</span>
               </div>
             </div>
@@ -178,139 +164,7 @@ export default function Dashboard({ prices, hub, isDark = true, insights }: Dash
         </CardContent>
       </Card>
 
-      <div>
-        <h2 className="text-lg font-semibold text-foreground mb-4">Your Savings</h2>
-        {insights && insights.length > 0 ? (
-          <div className="grid md:grid-cols-3 gap-4">
-            {insights.map((insight) => (
-              <InsightCard key={insight.device} insight={insight} />
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="py-10 text-center">
-              <p className="text-muted-foreground">Add your devices to see potential savings</p>
-              <p className="text-sm text-muted-foreground/80 mt-1">Configure flexible loads in your profile</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold text-green-600 dark:text-green-400">
-              🟢 Best Times to Run
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <ul className="space-y-2">
-              {cheapest.map((p, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between items-center py-2 border-b border-border last:border-0"
-                >
-                  <span className="text-muted-foreground">{formatHour(p.intervalEnd)}</span>
-                  <span className="font-mono text-blue-600 dark:text-blue-400">{formatPrice(p.pricePerMwh)}/MWh</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-muted-foreground pt-1">
-              Run dishwashers, laundry, EV charging during these hours
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold text-orange-600 dark:text-orange-400">
-              🔴 Times to Avoid
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <ul className="space-y-2">
-              {mostExpensive.map((p, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between items-center py-2 border-b border-border last:border-0"
-                >
-                  <span className="text-muted-foreground">{formatHour(p.intervalEnd)}</span>
-                  <span className="font-mono text-orange-600 dark:text-orange-400">{formatPrice(p.pricePerMwh)}/MWh</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-muted-foreground pt-1">
-              If on a time-of-use plan, shift flexible loads away from these hours
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <PriceAlerts prices={prices} />
     </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  sublabel,
-  color,
-}: {
-  label: string;
-  value: string;
-  sublabel: string;
-  color: string;
-}) {
-  return (
-    <Card size="sm">
-      <CardContent className="space-y-1 pt-0">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="text-2xl font-bold" style={{ color }}>
-          {value}
-        </p>
-        <p className="text-xs text-muted-foreground">{sublabel}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function InsightCard({ insight }: { insight: Insight }) {
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">{insight.device}</CardTitle>
-        <CardAction>
-          <Badge
-            variant="outline"
-            className="border-blue-200 bg-blue-100 text-blue-800 dark:border-blue-500/40 dark:bg-blue-500/20 dark:text-blue-300"
-          >
-            {formatCost(insight.monthlySavings)}/mo
-          </Badge>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <p className="text-muted-foreground text-xs mb-0.5">Optimal</p>
-            <p className="font-mono text-blue-600 dark:text-blue-400">
-              {insight.optimalWindow.hour}:00 — {formatCost(insight.estimatedDailyCostAtOptimal)}/day
-            </p>
-          </div>
-          <div>
-            <p className="text-muted-foreground text-xs mb-0.5">If at peak</p>
-            <p className="font-mono text-orange-600 dark:text-orange-400">
-              {insight.peakWindow.hour}:00 — {formatCost(insight.estimatedDailyCostAtPeak)}/day
-            </p>
-          </div>
-        </div>
-
-        <div className="pt-3 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            Save{' '}
-            <span className="text-blue-600 dark:text-blue-400 font-semibold">{formatCost(insight.monthlySavings)}/month</span> by
-            shifting to the cheapest window
-          </p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

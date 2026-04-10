@@ -4,6 +4,7 @@
   "description": "ERCOT energy optimization - find the cheapest times to run your flexible loads",
   "type": "module",
   "scripts": {
+    "dev": "npm run dev --prefix dashboard",
     "fetch": "node src/fetcher/ercot.mjs",
     "fetch:loop": "node src/fetcher/ercot-loop.mjs",
     "test": "node --test tests/*.test.mjs"

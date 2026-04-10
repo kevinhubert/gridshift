@@ -50,6 +50,14 @@ npm run fetch:loop
 
 ### Frontend
 
+From the repo root (after `npm install` inside `dashboard` once):
+
+```bash
+npm run dev
+```
+
+Or from `dashboard/`:
+
 ```bash
 cd dashboard
 npm install
