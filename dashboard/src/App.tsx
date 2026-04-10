@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
-import { PricePoint, OptimizationResponse } from './types';
+import { PricePoint } from './types';
 
 const FUNCTION_BASE = import.meta.env.VITE_FUNCTION_BASE || '';
 
@@ -34,39 +34,6 @@ const DEMO_PRICES: PricePoint[] = [
   { intervalEnd: '23:00', pricePerMwh: 32 },
 ];
 
-const DEMO_INSIGHTS: OptimizationResponse = {
-  hub: DEMO_HUB,
-  day: new Date().toISOString().split('T')[0],
-  insights: [
-    {
-      device: 'EV Charger',
-      dailyKwh: 30,
-      optimalWindow: { hour: 2, pricePerMwh: 27 },
-      peakWindow: { hour: 15, pricePerMwh: 72 },
-      estimatedDailyCostAtOptimal: 0.81,
-      estimatedDailyCostAtPeak: 2.16,
-      monthlySavings: 40.50,
-    },
-    {
-      device: 'Pool Pump',
-      dailyKwh: 5,
-      optimalWindow: { hour: 10, pricePerMwh: 8 },
-      peakWindow: { hour: 15, pricePerMwh: 72 },
-      estimatedDailyCostAtOptimal: 0.04,
-      estimatedDailyCostAtPeak: 0.36,
-      monthlySavings: 9.60,
-    },
-    {
-      device: 'Dishwasher',
-      dailyKwh: 2,
-      optimalWindow: { hour: 3, pricePerMwh: 28 },
-      peakWindow: { hour: 17, pricePerMwh: 59 },
-      estimatedDailyCostAtOptimal: 0.06,
-      estimatedDailyCostAtPeak: 0.12,
-      monthlySavings: 1.80,
-    },
-  ],
-};
 
 interface PriceApiResponse {
   hub: string;
@@ -76,7 +43,6 @@ interface PriceApiResponse {
 
 export default function App() {
   const [prices, setPrices] = useState<PricePoint[] | null>(null);
-  const [insights] = useState<OptimizationResponse | null>(DEMO_INSIGHTS);
   const [hub, setHub] = useState(DEMO_HUB);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
