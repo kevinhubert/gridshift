@@ -137,8 +137,8 @@ export default function App() {
               height={48}
               className="w-full"
             />
-            <p className="text-sm text-navy-700 dark:text-white w-full flex justify-between">
-              <span>Beat the <span className="text-orange-500">peak</span></span>
+            <p className="text-sm text-navy-700 dark:text-white pl-[50px]">
+              Beat the <span className="text-orange-500">peak</span>
             </p>
           </div>
           <div className="flex items-center gap-3">
