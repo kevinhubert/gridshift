@@ -128,16 +128,17 @@ export default function App() {
     <div className="min-h-screen">
       {/* Header */}
       <header className="border-b border-neutral-200 dark:border-navy-800 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex flex-col gap-1">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-y-3">
+          <div className="flex flex-col gap-1 w-[220px]">
             <img
               src={theme === 'dark' ? '/logo-dark.svg' : '/logo-light.svg'}
               alt="GridShift"
-              width={180}
-              height={39}
+              width={220}
+              height={48}
+              className="w-full"
             />
-            <p className="text-sm text-navy-700 dark:text-white pl-[50px]">
-              Beat the <span className="text-orange-500">peak</span>
+            <p className="text-sm text-navy-700 dark:text-white w-full flex justify-between">
+              <span>Beat the <span className="text-orange-500">peak</span></span>
             </p>
           </div>
           <div className="flex items-center gap-3">
