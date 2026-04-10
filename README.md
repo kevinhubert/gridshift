@@ -4,13 +4,15 @@
 
 GridShift monitors live and day-ahead electricity prices from ERCOT, then recommends the optimal times to run flexible loads (EV chargers, pool pumps, dishwashers, etc.) based on your household's schedule.
 
+**Documentation:** For structure, dashboard stack, design tokens, and agent-oriented conventions, see [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md).
+
 ## How it works
 
 ERCOT wholesale electricity prices fluctuate every 15 minutes — sometimes 6–10x between midnight and 4 PM. GridShift watches those prices and tells you when to run your appliances.
 
 ## Tech Stack
 
-- **Frontend:** React + Vite (hosted on Vercel)
+- **Frontend:** React + Vite, React Router, Tailwind, shadcn/ui (hosted on Vercel)
 - **Backend:** Supabase Edge Functions (TypeScript)
 - **Database:** Supabase (Postgres + RLS)
 - **Data source:** ERCOT public real-time settlement point prices

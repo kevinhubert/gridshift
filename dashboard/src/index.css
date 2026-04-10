@@ -2,7 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-neutral-50 text-navy-900 dark:bg-navy-950 dark:text-neutral-50;
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+/* GridShift semantic tokens (shadcn-compatible) — aligned with navy / neutral palette */
+:root {
+  --background: #f9f8f5;
+  --foreground: #0d1b2a;
+  --card: #ffffff;
+  --card-foreground: #0d1b2a;
+  --popover: #ffffff;
+  --popover-foreground: #0d1b2a;
+  --primary: #0d1b2a;
+  --primary-foreground: #f9f8f5;
+  --secondary: #f0eee8;
+  --secondary-foreground: #0d1b2a;
+  --muted: #f0eee8;
+  --muted-foreground: #7a7a75;
+  --accent: #eef3f8;
+  --accent-foreground: #0d1b2a;
+  --destructive: #cc4a1e;
+  --destructive-foreground: #ffffff;
+  --border: #e5e3dd;
+  --input: #e5e3dd;
+  --ring: #4da3ff;
+  --radius: 0.625rem;
+  --radius-md: 0.5rem;
+}
+
+.dark {
+  --background: #061120;
+  --foreground: #f9f8f5;
+  --card: #0d1b2a;
+  --card-foreground: #f9f8f5;
+  --popover: #0d1b2a;
+  --popover-foreground: #f9f8f5;
+  --primary: #f9f8f5;
+  --primary-foreground: #0d1b2a;
+  --secondary: #132b45;
+  --secondary-foreground: #f9f8f5;
+  --muted: #132b45;
+  --muted-foreground: #a3a39e;
+  --accent: #132b45;
+  --accent-foreground: #f9f8f5;
+  --destructive: #e8825a;
+  --destructive-foreground: #061120;
+  --border: #132b45;
+  --input: #132b45;
+  --ring: #4da3ff;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
 }

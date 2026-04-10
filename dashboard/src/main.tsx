@@ -1,17 +1,18 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
 import posthog from 'posthog-js';
 import './index.css';
-import App from './App';
+import { router } from './router';
 
 posthog.init('phc_tATEMXnR88epnpgR3iryRkYPj9N38pDxk8DmJx5GSU9P', {
   api_host: 'https://us.i.posthog.com',
-  capture_pageview: true,
+  capture_pageview: false,
   capture_pageleave: true,
 });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </StrictMode>
 );
