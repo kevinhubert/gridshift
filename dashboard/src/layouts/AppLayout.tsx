@@ -3,6 +3,7 @@ import { Outlet, useLocation, useMatch } from 'react-router-dom';
 import posthog from 'posthog-js';
 import { PricePoint } from '@/types';
 import { GridShiftHeader } from '@/components/layout/GridShiftHeader';
+import { LocationBar } from '@/components/layout/LocationBar';
 import { DEMO_HUB } from '@/constants/hubs';
 
 const FUNCTION_BASE = import.meta.env.VITE_FUNCTION_BASE || '';
@@ -141,6 +142,12 @@ export default function AppLayout() {
         theme={theme}
         onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       />
+
+      <div className="border-b border-border bg-card">
+        <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
+          <LocationBar hub={hub} onHubChange={setHub} />
+        </div>
+      </div>
 
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-6 py-8">
         <Outlet context={outletContext} />

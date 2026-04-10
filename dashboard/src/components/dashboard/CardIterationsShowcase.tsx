@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -7,6 +7,11 @@ import { cn } from '@/lib/utils';
 
 const MOCK_PRICES_TODAY = [
   22, 20, 18, 17, 16, 15, 14, 15, 18, 24, 32, 38, 42, 33, 30, 35, 48, 62, 85, 110, 145, 167, 120, 55,
+];
+
+/** Mock last-24h series (from `Last24Card.jsx`) until wired to history API. */
+const LAST_24H_PRICES = [
+  45, 42, 38, 35, 32, 28, 25, 22, 20, 24, 32, 38, 42, 33, 30, 35, 48, 62, 85, 110, 145, 167, 120, 55,
 ];
 const CURRENT_HOUR = 14;
 const CURRENT_PRICE = 30.4;
@@ -176,6 +181,57 @@ function Label({ children }: { children: ReactNode }) {
     <span className="text-xs font-medium uppercase tracking-[0.06em] text-gs-text-secondary dark:text-gs-dark-text-secondary">
       {children}
     </span>
+  );
+}
+
+function MiniBar({ value, max, color }: { value: number; max: number; color: string }) {
+  return (
+    <div className="mt-1.5 h-1 rounded-sm bg-muted dark:bg-white/[0.06]">
+      <div
+        className="h-full rounded-sm transition-[width] duration-500 ease-out"
+        style={{ width: `${(value / max) * 100}%`, background: color }}
+      />
+    </div>
+  );
+}
+
+function Last24HoursCard({ hubCode }: { hubCode: string }) {
+  const { low, high, avg } = useMemo(() => {
+    const l = Math.min(...LAST_24H_PRICES);
+    const h = Math.max(...LAST_24H_PRICES);
+    const a = LAST_24H_PRICES.reduce((s, v) => s + v, 0) / LAST_24H_PRICES.length;
+    return { low: l, high: h, avg: a };
+  }, []);
+
+  const barMax = high * 1.1;
+  const rows = [
+    { label: 'Low', value: low, color: 'var(--gs-cheap)' },
+    { label: 'Avg', value: avg, color: 'var(--gs-moderate)' },
+    { label: 'High', value: high, color: 'var(--gs-peak)' },
+  ] as const;
+
+  return (
+    <Card accentGlow="var(--gs-glow-moderate)">
+      <Label>Previous 24 Hours</Label>
+      <div className="mt-4 flex flex-col gap-4">
+        {rows.map((r) => (
+          <div key={r.label}>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[13px] text-gs-text-secondary dark:text-gs-dark-text-secondary">
+                {r.label}
+              </span>
+              <span className="font-gs-mono text-[22px] font-bold" style={{ color: r.color }}>
+                ${r.value.toFixed(2)}
+              </span>
+            </div>
+            <MiniBar value={r.value} max={barMax} color={r.color} />
+          </div>
+        ))}
+      </div>
+      <div className="mt-3.5 text-[11px] text-gs-text-muted dark:text-gs-dark-text-muted">
+        $/MWh · {hubCode}
+      </div>
+    </Card>
   );
 }
 
@@ -376,8 +432,12 @@ function Next4HoursCard() {
   );
 }
 
+export type CardIterationsShowcaseProps = {
+  hub: string;
+};
+
 /** Glass metric cards (mock series until wired to live prices). */
-export function CardIterationsShowcase() {
+export function CardIterationsShowcase({ hub }: CardIterationsShowcaseProps) {
   return (
     <section className="font-gs-body">
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5">
@@ -385,6 +445,7 @@ export function CardIterationsShowcase() {
         <BestTimeCard />
         <RateComparisonCard />
         <Next4HoursCard />
+        <Last24HoursCard hubCode={hub} />
       </div>
     </section>
   );

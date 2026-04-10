@@ -90,7 +90,7 @@ Defined in `dashboard/.env` (not committed with real secrets in a proper setup):
 | `/` | [HomePage](../dashboard/src/pages/HomePage.tsx) | Fetches prices when the user is on this route; shows [Dashboard](../dashboard/src/pages/Dashboard.tsx) |
 | `/about` | [AboutPage](../dashboard/src/pages/AboutPage.tsx) | Static info; no price fetch |
 
-Shared chrome: [AppLayout](../dashboard/src/layouts/AppLayout.tsx) (header, nav, footer, hub selector on home only, theme toggle). Child routes receive context via `<Outlet context={…} />` (hub, prices, errors, theme).
+Shared chrome: [AppLayout](../dashboard/src/layouts/AppLayout.tsx) (header, [LocationBar](../dashboard/src/components/layout/LocationBar.tsx) under header, nav, footer, theme toggle). Hub is set from the location bar (or stays default); child routes receive context via `<Outlet context={…} />` (hub, prices, errors, theme).
 
 Router definition: [dashboard/src/router.tsx](../dashboard/src/router.tsx). App entry: [dashboard/src/main.tsx](../dashboard/src/main.tsx) (`RouterProvider`).
 

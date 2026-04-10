@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
-import { PricePoint, Insight } from '@/types';
+import { PricePoint } from '@/types';
 import {
   Card,
   CardAction,
@@ -17,14 +17,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { MetricCards } from '@/components/dashboard/MetricCards';
 import { PriceAlerts } from '@/components/dashboard/PriceAlerts';
 
 interface DashboardProps {
   prices: PricePoint[];
   hub: string;
   isDark?: boolean;
-  insights?: Insight[];
 }
 
 function getPriceColor(price: number, min: number, max: number): string {
@@ -46,7 +44,7 @@ function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`;
 }
 
-export default function Dashboard({ prices, hub, isDark = true, insights }: DashboardProps) {
+export default function Dashboard({ prices, hub, isDark = true }: DashboardProps) {
   const priceValues = prices.map((p) => p.pricePerMwh);
   const min = Math.min(...priceValues);
   const max = Math.max(...priceValues);
@@ -58,18 +56,6 @@ export default function Dashboard({ prices, hub, isDark = true, insights }: Dash
     color: getPriceColor(p.pricePerMwh, min, max),
   }));
 
-  const cheapest = [...prices].sort((a, b) => a.pricePerMwh - b.pricePerMwh);
-  const mostExpensive = [...prices].sort((a, b) => b.pricePerMwh - a.pricePerMwh);
-
-  const dailySavingsTotal =
-    insights?.reduce(
-      (s, i) => s + Math.max(0, i.estimatedDailyCostAtPeak - i.estimatedDailyCostAtOptimal),
-      0
-    ) ?? 0;
-  const savingsValue =
-    insights && insights.length > 0 ? formatPrice(dailySavingsTotal) : '—';
-  const savingsDetail = insights?.length ? 'vs. running at peak' : 'vs. flat rate';
-
   const gridColor = isDark ? '#132B45' : '#e5e3dd';
   const tickColor = isDark ? '#7A7A75' : '#7A7A75';
   const tooltipBg = isDark ? '#0D1B2A' : '#ffffff';
@@ -78,16 +64,6 @@ export default function Dashboard({ prices, hub, isDark = true, insights }: Dash
 
   return (
     <div className="space-y-8">
-      <MetricCards
-        low={min}
-        lowAtInterval={cheapest[0]?.intervalEnd ?? '00:00'}
-        high={max}
-        highAtInterval={mostExpensive[0]?.intervalEnd ?? '00:00'}
-        avg={avg}
-        savingsValue={savingsValue}
-        savingsDetail={savingsDetail}
-      />
-
       <Card>
         <CardHeader>
           <div>
