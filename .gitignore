@@ -4,4 +4,7 @@ node_modules/
 supabase.tar.gz
 supabase/.temp/
 dist/
+.vercel/
+*.tsbuildinfo
+package-lock.json
 .vercel
