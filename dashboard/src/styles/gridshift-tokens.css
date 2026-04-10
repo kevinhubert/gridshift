@@ -1,0 +1,74 @@
+/* ============================================
+   GridShift Design Tokens
+   ============================================ */
+
+:root {
+  /* --- Surfaces (light) --- */
+  --gs-bg-base: #f9f8f5;
+  --gs-bg-elevated: #ffffff;
+  --gs-card: #ffffff;
+  --gs-muted: #f0eee8;
+  --gs-border: #e5e3dd;
+  --gs-ring: #4da3ff;
+
+  /* --- Text (light) --- */
+  --gs-text-primary: #0d1b2a;
+  --gs-text-secondary: #7a7a75;
+  --gs-text-muted: #a3a39e;
+
+  /* --- Surfaces (dark) --- */
+  --gs-dark-bg-base: #061120;
+  --gs-dark-bg-elevated: #0d1b2a;
+  --gs-dark-card: #0d1b2a;
+  --gs-dark-muted: #132b45;
+  --gs-dark-border: #132b45;
+  --gs-dark-ring: #4da3ff;
+
+  /* --- Text (dark) --- */
+  --gs-dark-text-primary: #f9f8f5;
+  --gs-dark-text-secondary: #a3a39e;
+  --gs-dark-text-muted: rgba(163, 163, 158, 0.5);
+
+  /* --- Brand --- */
+  --gs-brand: #2b7fd4;
+  --gs-destructive: #cc4a1e;
+  --gs-dark-destructive: #e8825a;
+
+  /* --- Price status --- */
+  --gs-cheap: #34d399;
+  --gs-moderate: #fbbf24;
+  --gs-elevated: #f97316;
+  --gs-peak: #ef4444;
+
+  /* --- Accent glows (dark card corner blobs) --- */
+  --gs-glow-cheap: rgba(52, 211, 153, 0.12);
+  --gs-glow-moderate: rgba(251, 191, 36, 0.12);
+  --gs-glow-elevated: rgba(249, 115, 22, 0.12);
+  --gs-glow-peak: rgba(239, 68, 68, 0.12);
+
+  /* --- Status badges --- */
+  --gs-badge-cheap: rgba(52, 211, 153, 0.08);
+  --gs-badge-moderate: rgba(251, 191, 36, 0.08);
+  --gs-badge-elevated: rgba(249, 115, 22, 0.08);
+  --gs-badge-peak: rgba(239, 68, 68, 0.08);
+
+  /* --- Glass card (dark mode) --- */
+  --gs-card-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  --gs-card-surface-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.04) 100%);
+  --gs-card-border: rgba(255, 255, 255, 0.08);
+  --gs-card-border-hover: rgba(255, 255, 255, 0.14);
+  --gs-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --gs-card-radius: 16px;
+  --gs-card-blur: 12px;
+
+  /* --- Gradients --- */
+  --gs-grad-dark-app: linear-gradient(160deg, #0a0f1a 0%, #0d1520 40%, #0f1a2a 100%);
+  --gs-grad-navy-depth: linear-gradient(165deg, #061120 0%, #0d1b2a 50%, #132b45 100%);
+  --gs-grad-brand-edge: linear-gradient(135deg, #0d1b2a 0%, #061120 50%, #185fa5 100%);
+  --gs-grad-light-wash: linear-gradient(160deg, #f9f8f5 0%, #f0eee8 45%, #eef3f8 100%);
+
+  /* --- Fonts --- */
+  --gs-font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --gs-font-body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --gs-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}

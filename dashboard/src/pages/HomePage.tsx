@@ -11,12 +11,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { HUB_OPTIONS } from '@/constants/hubs';
+import { CardIterationsShowcase } from '@/components/dashboard/CardIterationsShowcase';
 
 export default function HomePage() {
   const { hub, setHub, displayPrices, loading, error, theme } = useOutletContext<AppLayoutOutletContext>();
 
   return (
     <>
+      <CardIterationsShowcase />
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-muted-foreground">Hub:</span>
