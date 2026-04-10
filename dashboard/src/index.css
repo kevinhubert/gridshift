@@ -4,5 +4,5 @@
 
 body {
   @apply bg-neutral-50 text-navy-900 dark:bg-navy-950 dark:text-neutral-50;
-  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }

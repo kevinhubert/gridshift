@@ -1,0 +1,8 @@
+<svg width="240" height="52" viewBox="0 0 240 52" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(14,4)">
+    <path d="M18,2 L4,2 L4,22 L20,22 L20,42 L6,42" fill="none" stroke="#0D1B2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6,2 L20,2 L20,22 L4,22 L4,42 L18,42" fill="none" stroke="#0D1B2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
+  </g>
+  <text x="50" y="32" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="600" fill="#0D1B2A" letter-spacing="-0.8">Grid</text>
+  <text x="112" y="32" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="400" fill="#2B7FD4" letter-spacing="-0.8">Shift</text>
+</svg>

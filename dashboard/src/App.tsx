@@ -129,9 +129,14 @@ export default function App() {
       {/* Header */}
       <header className="border-b border-neutral-200 dark:border-navy-800 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-500">GridShift</h1>
-            <p className="text-sm text-neutral-500 dark:text-neutral-500">Stop paying ERCOT's peak tax</p>
+          <div className="flex flex-col gap-1">
+            <img
+              src={theme === 'dark' ? '/logo-dark.svg' : '/logo-light.svg'}
+              alt="GridShift"
+              width={180}
+              height={39}
+            />
+            <p className="text-sm text-neutral-500 pl-[50px]">Stop paying ERCOT's peak tax</p>
           </div>
           <div className="flex items-center gap-3">
             {loading && (
