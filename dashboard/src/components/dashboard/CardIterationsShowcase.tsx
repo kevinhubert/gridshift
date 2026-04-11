@@ -212,7 +212,7 @@ function Last24HoursCard({ hubCode }: { hubCode: string }) {
 
   return (
     <Card accentGlow="var(--gs-glow-moderate)">
-      <Label>Previous 24 Hours</Label>
+      <Label>Previous 24 hours</Label>
       <div className="mt-4 flex flex-col gap-4">
         {rows.map((r) => (
           <div key={r.label}>
@@ -246,7 +246,7 @@ function CurrentPriceCard() {
     <Card accentGlow={GS_GLOW[tier]}>
       <div className="flex items-start justify-between">
         <div>
-          <Label>Right Now</Label>
+          <Label>Right now</Label>
           <div className="mt-2 flex items-baseline gap-2">
             <span
               className="font-gs-mono text-[42px] font-bold leading-none"
@@ -295,7 +295,7 @@ function BestTimeCard() {
 
   return (
     <Card accentGlow="var(--gs-glow-cheap)">
-      <Label>Best Time to Run</Label>
+      <Label>Best time</Label>
       <div className="mt-2.5 font-gs-mono text-[28px] font-bold text-gs-cheap">{hourLabel}</div>
       <div className="mt-0.5 text-[13px] text-gs-text-secondary dark:text-gs-dark-text-secondary">
         ~${cheapestPrice}/MWh
@@ -319,7 +319,7 @@ function RateComparisonCard() {
 
   return (
     <Card accentGlow={glow}>
-      <Label>vs. Your Flat Rate</Label>
+      <Label>Vs. your flat fee</Label>
       <div className="mt-3.5 flex flex-col gap-2.5">
         <div>
           <div className="mb-1 flex justify-between">
@@ -392,7 +392,7 @@ function Next4HoursCard() {
     <Card accentGlow={GS_GLOW[lastTier]}>
       <div className="flex items-start justify-between">
         <div>
-          <Label>Next 4 Hours</Label>
+          <Label>Next 4 hours</Label>
           <div className="mt-2 flex items-center gap-1.5">
             <TrendArrow direction={trendDir} />
             <span className="text-sm text-gs-text-secondary dark:text-gs-dark-text-secondary">
@@ -436,17 +436,37 @@ export type CardIterationsShowcaseProps = {
   hub: string;
 };
 
-/** Glass metric cards (mock series until wired to live prices). */
-export function CardIterationsShowcase({ hub }: CardIterationsShowcaseProps) {
+/** Right now, Best time, Previous 24 hours — below the header. */
+export function CardIterationsShowcaseTop({ hub }: CardIterationsShowcaseProps) {
   return (
     <section className="font-gs-body">
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5">
         <CurrentPriceCard />
         <BestTimeCard />
-        <RateComparisonCard />
-        <Next4HoursCard />
         <Last24HoursCard hubCode={hub} />
       </div>
     </section>
+  );
+}
+
+/** Vs. flat fee, Next 4 hours — anchored to bottom of the home page. */
+export function CardIterationsShowcaseBottom() {
+  return (
+    <section className="font-gs-body">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5 md:grid-cols-2">
+        <RateComparisonCard />
+        <Next4HoursCard />
+      </div>
+    </section>
+  );
+}
+
+/** @deprecated Use {@link CardIterationsShowcaseTop} + {@link CardIterationsShowcaseBottom} on the page. */
+export function CardIterationsShowcase({ hub }: CardIterationsShowcaseProps) {
+  return (
+    <div className="space-y-8 font-gs-body">
+      <CardIterationsShowcaseTop hub={hub} />
+      <CardIterationsShowcaseBottom />
+    </div>
   );
 }

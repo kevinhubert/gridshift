@@ -16,7 +16,7 @@ GridShift helps Texas electricity customers on ERCOT see when wholesale-style pr
 
 | Path | Role |
 |------|------|
-| [dashboard/](../dashboard/) | **Primary web app** — Vite + React + TypeScript, React Router, Tailwind, shadcn/ui, Recharts |
+| [dashboard/](../dashboard/) | **Primary web app** — Vite + React + TypeScript, React Router, Tailwind, shadcn/ui, **Nivo** (`@nivo/line`, `@nivo/geo`) |
 | [src/](../src/) (repo root) | Node fetcher (`ercot.mjs`, `ercot-loop.mjs`), shared libs, Supabase edge function **source** (see below) |
 | [supabase/](../supabase/) | `schema.sql`, `config.toml`, deployed edge functions under `functions/*` |
 
@@ -30,7 +30,8 @@ GridShift helps Texas electricity customers on ERCOT see when wholesale-style pr
 - **UI:** React 18, [shadcn/ui](https://ui.shadcn.com/) (Radix primitives + `class-variance-authority` + `tailwind-merge`), [`cn()` helper](../dashboard/src/lib/utils.ts)
 - **Styling:** Tailwind CSS 3, `darkMode: 'class'`
 - **Routing:** React Router 7 — [`createBrowserRouter`](../dashboard/src/router.tsx), layout with [`<Outlet />`](../dashboard/src/layouts/AppLayout.tsx)
-- **Charts:** Recharts
+- **Charts:** `@nivo/line` — today’s price curve in [`Dashboard.tsx`](../dashboard/src/pages/Dashboard.tsx) (`ResponsiveLine`, area gradient, average marker).
+- **Geo map:** `@nivo/geo` plus **`d3-geo@1.x`** (same major as Nivo’s dependency) for `fitExtent` — scale/translate must match Nivo’s internal projection or the map renders microscopic. Choropleth in [`ERCOTMap.tsx`](../dashboard/src/components/dashboard/ERCOTMap.tsx), **static** import from [`HomePage`](../dashboard/src/pages/HomePage.tsx).
 - **Analytics:** PostHog (`posthog-js`) — SPA pageviews captured on route change (see layout)
 - **Backend client:** `@supabase/supabase-js` where used
 
@@ -62,10 +63,10 @@ Defined in `dashboard/.env` (not committed with real secrets in a proper setup):
    CSS variables in `dashboard/src/index.css`: `--background`, `--foreground`, `--card`, `--primary`, `--border`, `--ring`, etc. Light and `.dark` values are tuned to match GridShift **navy** and **neutral** (not generic gray).
 
 2. **Extended palette (Tailwind)**  
-   [dashboard/tailwind.config.js](../dashboard/tailwind.config.js) defines full scales: `navy`, `blue`, `orange`, `amber`, `green`, `neutral`. Use these for **marketing accents**, **charts**, and **one-off** UI (e.g. section headings, Recharts hex colors).
+   [dashboard/tailwind.config.js](../dashboard/tailwind.config.js) defines full scales: `navy`, `blue`, `orange`, `amber`, `green`, `neutral`. Use these for **marketing accents**, **charts**, and **one-off** UI (e.g. section headings, Nivo line/area hex colors).
 
 3. **Charts**  
-   Recharts elements often use **explicit hex** (e.g. `#4DA3FF`, `#132B45`) for gradients and grid lines so they stay stable across theme tweaks. Prefer aligning new chart colors with the `blue` / `navy` scales when possible.
+   Nivo line/choropleth use **explicit hex** where needed (e.g. `#4DA3FF`, `#132B45`) for series, gradients, and grid lines. Prefer aligning new chart colors with the `blue` / `navy` scales when possible.
 
 ### Theme behavior
 
@@ -87,7 +88,7 @@ Defined in `dashboard/.env` (not committed with real secrets in a proper setup):
 
 | Path | Page | Notes |
 |------|------|--------|
-| `/` | [HomePage](../dashboard/src/pages/HomePage.tsx) | Fetches prices when the user is on this route; shows [Dashboard](../dashboard/src/pages/Dashboard.tsx) |
+| `/` | [HomePage](../dashboard/src/pages/HomePage.tsx) | Fetches prices when the user is on this route; ERCOT map + [Dashboard](../dashboard/src/pages/Dashboard.tsx) |
 | `/about` | [AboutPage](../dashboard/src/pages/AboutPage.tsx) | Static info; no price fetch |
 
 Shared chrome: [AppLayout](../dashboard/src/layouts/AppLayout.tsx) (header, [LocationBar](../dashboard/src/components/layout/LocationBar.tsx) under header, nav, footer, theme toggle). Hub is set from the location bar (or stays default); child routes receive context via `<Outlet context={…} />` (hub, prices, errors, theme).
