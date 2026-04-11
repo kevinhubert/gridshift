@@ -154,6 +154,7 @@ export default {
         gs: ['var(--gs-font-sans)'],
         'gs-body': ['var(--gs-font-body)'],
         'gs-mono': ['var(--gs-font-mono)'],
+        'gs-serif': ['var(--gs-font-serif)'],
       },
     },
   },

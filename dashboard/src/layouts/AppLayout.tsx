@@ -49,6 +49,8 @@ export type AppLayoutOutletContext = {
   displayPrices: PricePoint[];
   loading: boolean;
   error: string | null;
+  /** Unix ms when prices were last set (fetch success, demo load, or demo fallback). */
+  pricesUpdatedAt: number | null;
   theme: 'dark' | 'light';
   setTheme: (t: 'dark' | 'light') => void;
 };
@@ -61,6 +63,7 @@ export default function AppLayout() {
   const [hub, setHub] = useState(DEMO_HUB);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pricesUpdatedAt, setPricesUpdatedAt] = useState<number | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const stored = localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') return stored;
@@ -90,6 +93,7 @@ export default function AppLayout() {
 
     if (!FUNCTION_BASE) {
       setPrices(DEMO_PRICES);
+      setPricesUpdatedAt(Date.now());
       return;
     }
 
@@ -114,12 +118,14 @@ export default function AppLayout() {
           setPrices(null);
           setError('No data yet — cron populates every 15 min');
         }
+        setPricesUpdatedAt(Date.now());
         setLoading(false);
       })
       .catch((err) => {
         console.error('Failed to fetch prices:', err);
         setPrices(DEMO_PRICES);
         setError('Using demo data');
+        setPricesUpdatedAt(Date.now());
         setLoading(false);
       });
   }, [hub, isHome]);
@@ -132,6 +138,7 @@ export default function AppLayout() {
     displayPrices,
     loading,
     error,
+    pricesUpdatedAt,
     theme,
     setTheme,
   };

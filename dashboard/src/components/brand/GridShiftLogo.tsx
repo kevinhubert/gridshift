@@ -45,7 +45,7 @@ export function GridShiftLogo({ size = 32, variant, className }: GridShiftLogoPr
           strokeLinejoin="round"
         />
       </svg>
-      <span className={cn('text-[20px] font-medium tracking-tight sm:text-[22px]', gridClass)}>
+      <span className={cn('text-[22px] font-medium tracking-tight sm:text-[25px]', gridClass)}>
         grid<span style={{ color: BRAND_BLUE }}>shift</span>
       </span>
     </div>

@@ -6,19 +6,28 @@ import {
   CardIterationsShowcaseBottom,
   CardIterationsShowcaseTop,
 } from '@/components/dashboard/CardIterationsShowcase';
+import { HeroCallout } from '@/components/dashboard/HeroCallout';
 import ERCOTMap from '@/components/dashboard/ERCOTMap';
 
 /** Flip to `true` when ERCOT map work resumes. */
 const SHOW_ERCOT_MAP = false;
 
 export default function HomePage() {
-  const { hub, setHub, displayPrices, error, theme } = useOutletContext<AppLayoutOutletContext>();
+  const { hub, setHub, displayPrices, error, pricesUpdatedAt, loading, theme } =
+    useOutletContext<AppLayoutOutletContext>();
 
   return (
     <>
-      <CardIterationsShowcaseTop hub={hub} />
+      <HeroCallout
+        prices={displayPrices}
+        hub={hub}
+        pricesUpdatedAt={pricesUpdatedAt}
+        loading={loading}
+      />
 
       <Dashboard prices={displayPrices} hub={hub} isDark={theme === 'dark'} />
+
+      <CardIterationsShowcaseTop hub={hub} />
 
       {error && (
         <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">

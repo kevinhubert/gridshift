@@ -77,3 +77,47 @@
     opacity: 0;
   }
 }
+
+/* HeroCallout — rotating headline */
+@keyframes gs-hero-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes gs-hero-fade-out-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+@keyframes gs-hero-dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.35);
+  }
+}
+
+/* GridShift hero v3 — live dot ring (uses --pulse-color on the element) */
+@keyframes gs-hero-live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--pulse-color, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--pulse-color, transparent);
+  }
+}
