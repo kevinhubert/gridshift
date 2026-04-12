@@ -161,7 +161,7 @@ export default function AppLayout() {
       </main>
 
       <footer className="mt-auto border-t border-border py-6 text-center text-sm text-muted-foreground">
-        GridShift · ERCOT real-time data · Updated every 15 minutes
+        grid shift - shift happens · ERCOT real-time data · Updated every 15 minutes
       </footer>
     </div>
   );

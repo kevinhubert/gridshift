@@ -48,7 +48,7 @@ export function GridShiftHeader({ theme, onThemeToggle }: GridShiftHeaderProps) 
           'md:h-16 md:gap-y-0 md:py-0'
         )}
       >
-        <Link to="/" className="z-10 inline-flex shrink-0 items-center" aria-label="GridShift home">
+        <Link to="/" className="z-10 inline-flex shrink-0 items-center" aria-label="grid shift home">
           <GridShiftLogo variant={theme === 'dark' ? 'dark' : 'light'} size={36} />
         </Link>
 

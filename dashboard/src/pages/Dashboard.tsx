@@ -45,7 +45,7 @@ export default function Dashboard({ prices, hub, isDark = true }: DashboardProps
 
   return (
     <div className="space-y-8">
-      <Card>
+      <Card className="border-0 bg-transparent shadow-none ring-0">
         <CardHeader>
           <div>
             <CardTitle className="text-lg">Today&apos;s Price Curve</CardTitle>
