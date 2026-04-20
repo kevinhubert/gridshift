@@ -3,7 +3,7 @@ import { geoMercator } from 'd3-geo';
 import { Choropleth } from '@nivo/geo';
 import type { ChoroplethBoundFeature } from '@nivo/geo';
 import type { Feature, FeatureCollection } from 'geojson';
-import posthog from 'posthog-js';
+import { captureAnalytics } from '@/lib/analytics';
 import type { PricePoint } from '@/types';
 import { HUB_OPTIONS, type HubOption } from '@/constants/hubs';
 import { arcgisZoneToHub, featureZoneKey, hubToArcgisZone } from '@/constants/ercot-zones';
@@ -319,7 +319,7 @@ export default function ERCOTMap({ displayPrices, hub, onHubChange }: ERCOTMapPr
                 const hubTarget = arcgisZoneToHub(zone);
                 if (!hubTarget || !onHubChange) return;
                 onHubChange(hubTarget);
-                posthog.capture('ercot_map_zone_click', { zone, hub: hubTarget });
+                captureAnalytics('ercot_map_zone_click', { zone, hub: hubTarget });
               }}
               theme={{
                 background: 'transparent',
@@ -387,7 +387,7 @@ export default function ERCOTMap({ displayPrices, hub, onHubChange }: ERCOTMapPr
               onMouseLeave={() => setHoveredZone(null)}
               onClick={() => {
                 onHubChange?.(opt.value);
-                posthog.capture('ercot_map_hub_pill', { hub: opt.value });
+                captureAnalytics('ercot_map_hub_pill', { hub: opt.value });
               }}
             >
               <div className="text-[10px] tracking-wide text-muted-foreground uppercase">

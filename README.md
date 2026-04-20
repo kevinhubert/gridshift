@@ -1,94 +1,83 @@
 # GridShift
 
-> Stop paying ERCOT's peak tax. Find the cheapest hours to run your flexible loads.
+> Free dashboard for ERCOT wholesale prices — see when power is cheap so you can time flexible loads.
 
-GridShift monitors live and day-ahead electricity prices from ERCOT, then recommends the optimal times to run flexible loads (EV chargers, pool pumps, dishwashers, etc.) based on your household's schedule.
+GridShift reads **public** ERCOT real-time settlement point prices and presents them in a small, polished UI (map + price curve and related views). There are **no accounts**; it is a single shared experience suitable for a **public portfolio** repo.
 
-**Documentation:** For structure, dashboard stack, design tokens, and agent-oriented conventions, see [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md).
+**Documentation:** Layout, stack, design tokens, and agent conventions live in [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md).
 
 ## How it works
 
-ERCOT wholesale electricity prices fluctuate every 15 minutes — sometimes 6–10x between midnight and 4 PM. GridShift watches those prices and tells you when to run your appliances.
+ERCOT wholesale prices move every 15 minutes. This project scrapes the public HTML table (no OAuth API key), optionally stores history in **Supabase**, and serves it through **edge functions** to the **Vite + React** dashboard. Without Supabase env vars, the UI still runs using **demo** price data.
 
-## Tech Stack
+## Tech stack
 
-- **Frontend:** React + Vite, React Router, Tailwind, shadcn/ui (hosted on Vercel)
-- **Backend:** Supabase Edge Functions (TypeScript)
-- **Database:** Supabase (Postgres + RLS)
-- **Data source:** ERCOT public real-time settlement point prices
+- **Frontend:** React + Vite, React Router, Tailwind, shadcn/ui
+- **Optional backend:** Supabase (Postgres + RLS) + Edge Functions
+- **Data source:** ERCOT public real-time SPP page
 
 ## Getting started
 
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
-- A Supabase project (free tier works)
+- npm
 
 ### Install
 
 ```bash
 npm install
+npm install --prefix dashboard
 ```
 
-### Run the fetcher locally
-
-```bash
-# Single fetch
-npm run fetch
-
-# Loop (polls every 15 min)
-npm run fetch:loop
-```
-
-### Supabase setup
-
-1. Create a project at https://supabase.com
-2. Run the schema from `supabase/schema.sql`
-3. Copy `.env.example` to `.env` and fill in your keys
-4. Deploy edge functions with `supabase functions deploy`
-
-### Frontend
-
-From the repo root (after `npm install` inside `dashboard` once):
+### Frontend (local)
 
 ```bash
 npm run dev
 ```
 
-Or from `dashboard/`:
+Opens the Vite app (default [http://localhost:3000](http://localhost:3000)). Configure optional backends:
 
 ```bash
-cd dashboard
-npm install
-npm run dev
+cp dashboard/.env.example dashboard/.env
+# Edit dashboard/.env — see PROJECT_GUIDE for variable meanings
 ```
+
+### Run the fetcher locally (optional)
+
+```bash
+npm run fetch        # single scrape
+npm run fetch:loop   # poll every 15 minutes
+```
+
+### Supabase (optional, for live data)
+
+1. Create a project at [https://supabase.com](https://supabase.com)
+2. Run `supabase/schema.sql` in the SQL editor
+3. Set `VITE_*` variables in `dashboard/.env` from `.env.example`
+4. Deploy functions: `supabase functions deploy`
 
 ## Project structure
 
 ```
 gridshift/
 ├── src/
-│   ├── fetcher/
-│   │   ├── ercot.mjs       # Core scraping logic
-│   │   └── ercot-loop.mjs  # 15-min polling loop
-│   ├── lib/
-│   │   └── supabase.ts     # Supabase client
-│   └── functions/          # Supabase Edge Functions
-│       ├── cache-prices.ts # Cron: fetch + store ERCOT prices
-│       ├── get-prices.ts   # Public: fetch latest prices
-│       └── get-insights.ts # Calculate optimal windows
-└── dashboard/              # React frontend
+│   └── fetcher/           # ERCOT HTML scrape (Node)
+├── supabase/
+│   ├── schema.sql
+│   └── functions/         # cache-prices, get-prices, get-insights
+└── dashboard/             # React frontend
 ```
 
 ## ERCOT data
 
-GridShift uses ERCOT's public real-time settlement point prices (SPPs), updated every 15 minutes. No API key required — data is scraped from the public HTML dashboard at `https://www.ercot.com/content/cdr/html/real_time_spp.html`.
+Data source: `https://www.ercot.com/content/cdr/html/real_time_spp.html` — no API key.
 
-The most useful hubs for Austin-area residents:
-- `LZ_HOUSTON` — Houston load zone (closest to Austin)
+Example hubs:
+
+- `LZ_HOUSTON` — Houston load zone
 - `HB_HOUSTON` — Houston hub
-- `LZ_RAYBN` — Rayban zone (sometimes has extreme spreads)
+- `LZ_RAYBN` — Rayburn zone
 
 ## License
 

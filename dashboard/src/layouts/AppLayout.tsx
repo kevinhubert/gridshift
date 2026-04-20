@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useMatch } from 'react-router-dom';
-import posthog from 'posthog-js';
+import { captureAnalytics } from '@/lib/analytics';
 import { PricePoint } from '@/types';
 import { GridShiftHeader } from '@/components/layout/GridShiftHeader';
 import { LocationBar } from '@/components/layout/LocationBar';
@@ -71,7 +71,7 @@ export default function AppLayout() {
   });
 
   useEffect(() => {
-    posthog.capture('$pageview', {
+    captureAnalytics('$pageview', {
       $current_url: window.location.href,
     });
   }, [location.pathname, location.search]);
@@ -161,7 +161,7 @@ export default function AppLayout() {
       </main>
 
       <footer className="mt-auto border-t border-border py-6 text-center text-sm text-muted-foreground">
-        grid shift - shift happens · ERCOT real-time data · Updated every 15 minutes
+        GridShift · ERCOT wholesale prices · Updated every 15 minutes
       </footer>
     </div>
   );
