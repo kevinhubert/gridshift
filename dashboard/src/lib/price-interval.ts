@@ -28,3 +28,31 @@ export function pickIntervalTickValues(xs: string[]): string[] {
   const step = Math.max(1, Math.ceil(xs.length / 12));
   return xs.filter((_, i) => i % step === 0);
 }
+
+/** Minutes from midnight for an interval-end label `HH:MM`. */
+export function minutesFromIntervalEnd(interval: string): number {
+  const [hs, ms] = normalizeIntervalEnd(interval).split(':');
+  const h = parseInt(hs, 10);
+  const m = parseInt(ms || '0', 10);
+  if (Number.isNaN(h)) return 0;
+  const hh = ((h % 24) + 24) % 24;
+  const mm = Number.isNaN(m) ? 0 : ((m % 60) + 60) % 60;
+  return hh * 60 + mm;
+}
+
+/** 12am, 3am, … — only marks that exist in the series (point scale). */
+export function pickThreeHourTickValues(xs: string[]): string[] {
+  if (xs.length === 0) return [];
+  const set = new Set(xs.map((x) => normalizeIntervalEnd(x)));
+  const marks = [
+    '00:00',
+    '03:00',
+    '06:00',
+    '09:00',
+    '12:00',
+    '15:00',
+    '18:00',
+    '21:00',
+  ];
+  return marks.filter((m) => set.has(m));
+}

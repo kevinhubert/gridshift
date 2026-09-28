@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
-import { getPriceForHour, getPriceForLocalHour } from '@/lib/current-hour-price';
+import { centralNowMs, formatUsd, formatWallClock, type PriceSnapshot, type TimedPrice } from '@/lib/prices';
 import { getPriceTier, getTierDisplayLabel, type PriceTier } from '@/lib/price-tier';
-import type { PricePoint } from '@/types';
 
 /**
  * Message pools from `gridshift-hero-v3.jsx` (cheap / moderate / peak).
@@ -53,16 +52,14 @@ const TIER_ACCENT_VAR: Record<PriceTier, string> = {
   peak: 'var(--gs-peak)',
 };
 
-function formatPricesUpdatedLabel(ts: number | null, loading: boolean): string {
-  if (loading) return 'Refreshing…';
-  if (ts == null) return 'Waiting for data';
-  const sec = Math.floor((Date.now() - ts) / 1000);
-  if (sec < 15) return 'Updated just now';
-  if (sec < 60) return `Updated ${sec} sec ago`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `Updated ${min} min ago`;
-  const hr = Math.floor(min / 60);
-  return hr === 1 ? 'Updated 1 hour ago' : `Updated ${hr} hours ago`;
+/** Age of the latest ERCOT interval (not of our fetch). */
+function formatPricesUpdatedLabel(snapshot: PriceSnapshot | null, loading: boolean): string {
+  if (!snapshot) return loading ? 'Loading…' : 'No data';
+  const { latest, stale } = snapshot;
+  if (stale) return `Last recorded ${formatWallClock(latest.ts)} CT`;
+  const min = Math.max(0, Math.floor((centralNowMs() - latest.ts) / 60_000));
+  if (min < 1) return `Interval ending ${latest.intervalEnd} CT · just now`;
+  return `Interval ending ${latest.intervalEnd} CT · ${min} min ago`;
 }
 
 type VsLastHour = {
@@ -70,9 +67,7 @@ type VsLastHour = {
   direction: 'up' | 'down' | 'flat';
 };
 
-function vsLastHour(prices: PricePoint[], current: PricePoint): VsLastHour | null {
-  const h = new Date().getHours();
-  const prev = getPriceForHour(prices, h - 1);
+function vsLastHour(current: TimedPrice, prev: TimedPrice | null): VsLastHour | null {
   if (!prev) return null;
   const delta = current.pricePerMwh - prev.pricePerMwh;
   if (delta === 0) return { delta: 0, direction: 'flat' };
@@ -84,10 +79,12 @@ type StatusPillProps = {
   price: number;
   vs: VsLastHour | null;
   hasPoint: boolean;
+  /** Pulse the dot only when the price is current. */
+  live: boolean;
 };
 
 /** Segmented pill from `gridshift-hero-v3.jsx`, themed with GridShift tokens. */
-function StatusPill({ tier, price, vs, hasPoint }: StatusPillProps) {
+function StatusPill({ tier, price, vs, hasPoint, live }: StatusPillProps) {
   const accent = TIER_ACCENT_VAR[tier];
   const shell: CSSProperties = {
     backgroundColor: `color-mix(in srgb, ${accent} 10%, transparent)`,
@@ -116,7 +113,7 @@ function StatusPill({ tier, price, vs, hasPoint }: StatusPillProps) {
             {
               background: accent,
               ['--pulse-color' as string]: pulseColor,
-              animation: 'gs-hero-live-pulse 2s ease-in-out infinite',
+              animation: live ? 'gs-hero-live-pulse 2s ease-in-out infinite' : undefined,
             } as CSSProperties
           }
           aria-hidden
@@ -128,7 +125,7 @@ function StatusPill({ tier, price, vs, hasPoint }: StatusPillProps) {
       <div className={dividerClass} style={dividerStyle} aria-hidden />
       <div className="px-3">
         <span className="font-gs-mono text-[13px] font-semibold tabular-nums text-foreground/80">
-          {hasPoint ? `$${price.toFixed(2)}` : '—'}
+          {hasPoint ? formatUsd(price) : '—'}
           <span className="font-normal text-muted-foreground/80">/MWh</span>
         </span>
       </div>
@@ -157,18 +154,20 @@ function StatusPill({ tier, price, vs, hasPoint }: StatusPillProps) {
 }
 
 export type HeroCalloutProps = {
-  prices: PricePoint[];
+  snapshot: PriceSnapshot | null;
   hub: string;
-  pricesUpdatedAt: number | null;
   loading?: boolean;
+  error?: string | null;
 };
 
-export function HeroCallout({ prices, hub, pricesUpdatedAt, loading = false }: HeroCalloutProps) {
-  const point = getPriceForLocalHour(prices);
-  const price = point?.pricePerMwh ?? 0;
-  const tier = point ? getPriceTier(price) : 'cheap';
+export function HeroCallout({ snapshot, hub, loading = false, error = null }: HeroCalloutProps) {
+  // A stalled feed must not read as "right now" — no rotating advice.
+  const point = snapshot && !snapshot.stale ? snapshot.latest : null;
+  const shown = snapshot?.latest ?? null;
+  const price = shown?.pricePerMwh ?? 0;
+  const tier = shown ? getPriceTier(price) : 'cheap';
   const pool = heroMessagePool(tier);
-  const vs = point ? vsLastHour(prices, point) : null;
+  const vs = shown && snapshot ? vsLastHour(shown, snapshot.hourAgo) : null;
 
   const [msgIndex, setMsgIndex] = useState(0);
   const [animState, setAnimState] = useState<'in' | 'out'>('in');
@@ -218,7 +217,9 @@ export function HeroCallout({ prices, hub, pricesUpdatedAt, loading = false }: H
   return (
     <section className="font-gs-body">
       <div className="max-w-[38rem]">
-        <StatusPill key={tier} tier={tier} price={price} vs={vs} hasPoint={Boolean(point)} />
+        {shown ? (
+          <StatusPill key={tier} tier={tier} price={price} vs={vs} hasPoint live={Boolean(point)} />
+        ) : null}
 
         <div className="min-h-[4.25rem]">
           {point ? (
@@ -241,10 +242,20 @@ export function HeroCallout({ prices, hub, pricesUpdatedAt, loading = false }: H
           ) : (
             <>
               <h1 className="font-gs-serif text-[2.125rem] font-normal italic leading-snug tracking-tight text-foreground">
-                No price for this hour yet.
+                {snapshot?.stale
+                  ? 'Live prices are paused.'
+                  : loading
+                    ? 'Checking the grid…'
+                    : error
+                      ? 'Prices are unavailable.'
+                      : 'No prices for this zone yet.'}
               </h1>
               <p className="mt-2.5 text-[15px] font-light leading-relaxed text-muted-foreground">
-                Try another hub or check back after the next data refresh.
+                {snapshot?.stale
+                  ? `We haven’t received new ERCOT data since ${formatWallClock(snapshot.latest.ts)}. The chart below shows the last recorded day.`
+                  : loading
+                    ? 'Fetching the latest ERCOT settlement prices.'
+                    : (error ?? 'Try another load zone or check back after the next refresh.')}
               </p>
             </>
           )}
@@ -254,7 +265,7 @@ export function HeroCallout({ prices, hub, pricesUpdatedAt, loading = false }: H
           <span className="font-gs-mono text-[11px] tracking-wide text-muted-foreground/70">
             {hub}
             <span className="mx-1.5 text-muted-foreground/40">·</span>
-            {formatPricesUpdatedLabel(pricesUpdatedAt, loading)}
+            {formatPricesUpdatedLabel(snapshot, loading)}
           </span>
         </div>
       </div>

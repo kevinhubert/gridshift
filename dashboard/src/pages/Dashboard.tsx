@@ -10,16 +10,21 @@ import {
 } from '@/components/ui/card';
 import { PriceCurveChart } from '@/components/dashboard/PriceCurveChart';
 import { normalizeIntervalEnd } from '@/lib/price-interval';
+import { formatDay } from '@/lib/prices';
 
 interface DashboardProps {
   prices: PricePoint[];
   hub: string;
+  /** Operating day of `prices` (YYYY-MM-DD). */
+  day: string;
+  /** Feed has stopped updating — label the date, drop the "now" marker. */
+  stale?: boolean;
   isDark?: boolean;
 }
 
 type LineDatum = { x: string; y: number };
 
-export default function Dashboard({ prices, hub, isDark = true }: DashboardProps) {
+export default function Dashboard({ prices, hub, day, stale = false, isDark = true }: DashboardProps) {
   const { lineData, avg } = useMemo(() => {
     if (!prices.length) {
       return {
@@ -48,14 +53,11 @@ export default function Dashboard({ prices, hub, isDark = true }: DashboardProps
       <Card className="border-0 bg-transparent shadow-none ring-0">
         <CardHeader>
           <div>
-            <CardTitle className="text-lg">Today&apos;s Price Curve</CardTitle>
+            <CardTitle className="text-lg font-semibold tracking-tight">
+              {stale ? `Price curve · ${formatDay(day)}` : 'Today’s price curve'}
+            </CardTitle>
             <CardDescription>
-              {hub} ·{' '}
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {hub} · 15-minute settlement intervals, Central Time
             </CardDescription>
           </div>
           <CardAction>
@@ -69,14 +71,14 @@ export default function Dashboard({ prices, hub, isDark = true }: DashboardProps
                 <span className="text-muted-foreground">Moderate</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="h-3 w-3 rounded-full bg-orange-500" />
+                <div className="h-3 w-3 rounded-full bg-red-500" />
                 <span className="text-muted-foreground">Peak</span>
               </div>
             </div>
           </CardAction>
         </CardHeader>
         <CardContent className="pb-4">
-          <PriceCurveChart lineData={lineData} avg={avg} isDark={isDark} />
+          <PriceCurveChart lineData={lineData} avg={avg} isDark={isDark} showNow={!stale} />
         </CardContent>
       </Card>
     </div>

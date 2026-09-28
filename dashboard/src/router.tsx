@@ -1,8 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import AppLayout from '@/layouts/AppLayout';
 import HomePage from '@/pages/HomePage';
-import AboutPage from '@/pages/AboutPage';
-import SavingsPage from '@/pages/SavingsPage';
 import RouteError from '@/pages/RouteError';
 
 export const router = createBrowserRouter([
@@ -12,8 +10,7 @@ export const router = createBrowserRouter([
     errorElement: <RouteError />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'savings', element: <SavingsPage /> },
-      { path: 'about', element: <AboutPage /> },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ]);
